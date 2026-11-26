@@ -1,12 +1,12 @@
 {
  "app": "consulta-catastral",
- "v": "v160",
- "seq": 160,
+ "v": "v164",
+ "seq": 164,
  "fecha": "2026-11-26",
- "archivo": "app-v160.html",
- "tam": 2412215,
- "sha256": "1fd9c4b5d46873fbecd39977f9dbc71df39ad177c997db0ce1acc5e63aa88417",
- "notas": "se elimino el boton de favoritos",
+ "archivo": "app-v164.html",
+ "tam": 2415291,
+ "sha256": "e57c97725954164a56988c9c3877f7df577e1cb5b0d28c8e07c2949ecab7ad46",
+ "notas": "proyección a futuro de nuevas herramientas",
  "llave": "p",
- "firma": "yn77kgNO1qMoOvFZ/q7INQPnJvz+0lrLIPf2jgmPXug13id/kM+m4FwV02L410TuZusGITqNVhQlt27xmt1zgw=="
+ "firma": "9rWHtxli7OCfpEtSoz/SdTCUid/4Vd69WlnjtP+JmcVSocsxWEexjd9ihixk1z5yaYjalepKWu4w5cP/ZtPPCA=="
 }
