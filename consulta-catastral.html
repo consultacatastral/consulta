@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<!--
+  ──────────────────────────────────────────────────────────────────
+  Consulta Catastral · Guadalajara — herramienta de uso libre y gratuito.
+  NO es una herramienta oficial ni está avalada por ninguna autoridad.
+
+  Este archivo es un CARGADOR: al abrirlo descarga la versión más reciente
+  de la herramienta desde https://consultacatastral.github.io/consulta/ , comprueba su firma
+  digital y la guarda en este navegador para usarla después (también sin
+  conexión a ese sitio). Solo acepta versiones firmadas por el autor.
+  No envía ningún dato tuyo: únicamente pregunta cuál es la última versión.
+
+  · MENSAJE DEL AUTOR · Esto lo hizo una persona. No lleva nombre a
+  propósito, pero sí tiene autor. Es gratuita y debe seguir siéndolo.
+  ──────────────────────────────────────────────────────────────────
+-->
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Consulta Catastral · Guadalajara</title>
+<style>
+body{margin:0;font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f8fafc;color:#0f172a}
+@media (prefers-color-scheme:dark){body{background:#0b1220;color:#e2e8f0}}
+.w{max-width:560px;margin:0 auto;padding:28px 18px}
+h1{font-size:20px;margin:0 0 6px}.m{color:#64748b;font-size:13px}
+.av{border-radius:12px;padding:12px 14px;margin:14px 0;border:1px solid #f59e0b;background:#fef3c7;color:#78350f}
+.av a{color:inherit;font-weight:700}
+#cc-st{margin:16px 0;font-size:15px}.bar{height:6px;border-radius:99px;background:rgba(148,163,184,.3);overflow:hidden}.bar>div{height:6px;width:0;background:#0f766e;transition:width .3s}
+button{font:inherit;padding:9px 14px;border-radius:10px;border:1px solid #0f766e;background:#0f766e;color:#fff;cursor:pointer;margin:4px 6px 0 0}button.s{background:transparent;color:inherit;border-color:#94a3b8}
+</style></head><body><div class="w">
+<h1>Consulta Catastral · Guadalajara</h1>
+<!-- Este aviso se ve solo si el navegador no ejecuta el cargador (p. ej. la vista previa de WhatsApp) -->
+<div class="av" id="cc-sinjs"><b>Esta vista no puede abrir la herramienta.</b><br>
+Parece que se abrió en una vista previa (por ejemplo, la de WhatsApp o «Archivos»).<br>
+· En <b>computadora o Android</b>: guarda el archivo y ábrelo con <b>Chrome</b> o <b>Edge</b>.<br>
+· En <b>iPhone</b>: entra desde Safari a <a href="https://consultacatastral.github.io/consulta/">consultacatastral.github.io/consulta</a></div>
+<div id="cc-ui" style="display:none"><div id="cc-st">Preparando…</div><div class="bar"><div id="cc-bar"></div></div><div id="cc-bt"></div><p class="m" id="cc-nota"></p></div>
+</div>
+<script>
+'use strict';
+(function(){
+document.getElementById('cc-sinjs').style.display='none';document.getElementById('cc-ui').style.display='block';
+var SITIO='https://consultacatastral.github.io/consulta/',PUBS={p:'BFdnBWM0CJ+gWjf6bvVyLrS82FVm/nxsGmCDOpFN29dryFAzhDNNgkCpgxafspCakY2A0GJ6swL+nROS0MzbyXk=',r:'BPEa7sTTjPZ2vheOci3Kno6fVzBYXFBlHdEE1VEwnam2SV/qvsWiP+R4QVEiOl8RcpfkBcAw4WOS/ykEJbPXAGs='},DB='cc-cargador',ST='app',T_ESPERA=4000;
+var $=function(i){return document.getElementById(i);},estado=function(t,p){$('cc-st').textContent=t;if(p!=null)$('cc-bar').style.width=p+'%';};
+var Q=new URLSearchParams(location.search),FORZAR=Q.get('actualizar')==='1';
+function preguntar(){try{return localStorage.getItem('cc-upd-preguntar')==='1';}catch(e){return false;}}
+
+/* ── almacenamiento: IndexedDB, con respaldo en localStorage ── */
+function idb(){return new Promise(function(res){try{var r=indexedDB.open(DB,1);r.onupgradeneeded=function(){r.result.createObjectStore(ST);};r.onsuccess=function(){res(r.result);};r.onerror=function(){res(null);};}catch(e){res(null);}});}
+function lee(){return idb().then(function(db){if(!db)return leeLS();return new Promise(function(res){try{var q=db.transaction(ST).objectStore(ST).get('actual');q.onsuccess=function(){res(q.result||leeLS());};q.onerror=function(){res(leeLS());};}catch(e){res(leeLS());}});});}
+function leeLS(){try{var x=localStorage.getItem('cc-app');return x?JSON.parse(x):null;}catch(e){return null;}}
+function guarda(o){return idb().then(function(db){if(db)return new Promise(function(res){try{var t=db.transaction(ST,'readwrite');t.objectStore(ST).put(o,'actual');t.oncomplete=function(){res(true);};t.onerror=function(){res(guardaLS(o));};}catch(e){res(guardaLS(o));}});return guardaLS(o);});}
+function guardaLS(o){try{localStorage.setItem('cc-app',JSON.stringify(o));return true;}catch(e){return false;}}
+
+/* ── SHA-256 y verificación ECDSA P-256 (WebCrypto, o en JavaScript si no está disponible) ── */
+function hex(b){var s='';for(var i=0;i<b.length;i++)s+=('0'+b[i].toString(16)).slice(-2);return s;}
+function deb64(s){var t=atob(s),b=new Uint8Array(t.length);for(var i=0;i<t.length;i++)b[i]=t.charCodeAt(i);return b;}
+function sha256js(m){var K=[],H=[1779033703,3144134277,1013904242,2773480762,1359893119,2600822924,528734635,1541459225],i,j;
+  for(var n=2,c=0;c<64;n++){var p=true;for(j=2;j*j<=n;j++)if(n%j===0){p=false;break;}if(p){K[c++]=(Math.pow(n,1/3)%1)*4294967296|0;}}
+  var l=m.length,L=((l+9+63)>>6)<<6,b=new Uint8Array(L);b.set(m);b[l]=128;var bl=l*8;for(i=0;i<4;i++)b[L-1-i]=(bl>>>(i*8))&255;b[L-5]=Math.floor(l/536870912)&255;
+  var w=new Int32Array(64);for(var o=0;o<L;o+=64){for(i=0;i<16;i++)w[i]=b[o+i*4]<<24|b[o+i*4+1]<<16|b[o+i*4+2]<<8|b[o+i*4+3];
+    for(i=16;i<64;i++){var x=w[i-15],y=w[i-2];w[i]=(((x>>>7|x<<25)^(x>>>18|x<<14)^(x>>>3))+w[i-7]+((y>>>17|y<<15)^(y>>>19|y<<13)^(y>>>10))+w[i-16])|0;}
+    var a=H[0],bb=H[1],cc=H[2],d=H[3],e=H[4],f=H[5],g=H[6],h=H[7];
+    for(i=0;i<64;i++){var t1=(h+((e>>>6|e<<26)^(e>>>11|e<<21)^(e>>>25|e<<7))+((e&f)^(~e&g))+K[i]+w[i])|0,t2=(((a>>>2|a<<30)^(a>>>13|a<<19)^(a>>>22|a<<10))+((a&bb)^(a&cc)^(bb&cc)))|0;h=g;g=f;f=e;e=(d+t1)|0;d=cc;cc=bb;bb=a;a=(t1+t2)|0;}
+    H[0]=H[0]+a|0;H[1]=H[1]+bb|0;H[2]=H[2]+cc|0;H[3]=H[3]+d|0;H[4]=H[4]+e|0;H[5]=H[5]+f|0;H[6]=H[6]+g|0;H[7]=H[7]+h|0;}
+  var r=new Uint8Array(32);for(i=0;i<8;i++){r[i*4]=H[i]>>>24;r[i*4+1]=H[i]>>>16&255;r[i*4+2]=H[i]>>>8&255;r[i*4+3]=H[i]&255;}return r;}
+function sha256(b){if(window.crypto&&crypto.subtle)return crypto.subtle.digest('SHA-256',b).then(function(x){return new Uint8Array(x);}).catch(function(){return sha256js(b);});return Promise.resolve(sha256js(b));}
+function verificaJS(pub,firma,msg){if(typeof BigInt==='undefined')return false;var P=BigInt('0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff'),N=BigInt('0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551'),A=P-3n,
+  Gx=BigInt('0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296'),Gy=BigInt('0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5');
+  var md=function(a,m){a%=m;return a<0n?a+m:a;},inv=function(a,m){var t=0n,nt=1n,r=m,nr=md(a,m);while(nr){var q=r/nr;var x=t-q*nt;t=nt;nt=x;x=r-q*nr;r=nr;nr=x;}return md(t,m);};
+  var big=function(b){return BigInt('0x'+(hex(b)||'0'));};
+  var add=function(p,q){if(!p)return q;if(!q)return p;if(p[0]===q[0]){if(md(p[1]+q[1],P)===0n)return null;var l=md(3n*p[0]*p[0]+A,P)*inv(2n*p[1],P)%P;}else var l=md(q[1]-p[1],P)*inv(q[0]-p[0],P)%P;
+    var x=md(l*l-p[0]-q[0],P);return [x,md(l*(p[0]-x)-p[1],P)];};
+  var mul=function(k,p){var r=null;while(k>0n){if(k&1n)r=add(r,p);p=add(p,p);k>>=1n;}return r;};
+  if(pub.length!==65||pub[0]!==4||firma.length!==64)return false;var Q=[big(pub.slice(1,33)),big(pub.slice(33))],r=big(firma.slice(0,32)),s=big(firma.slice(32));
+  if(r<=0n||r>=N||s<=0n||s>=N)return false;var e=big(sha256js(msg)),w=inv(s,N),R=add(mul(md(e*w,N),[Gx,Gy]),mul(md(r*w,N),Q));return !!R&&md(R[0],N)===r;}
+function verifica(o){var pub=PUBS[o.llave==='r'?'r':'p'];if(!pub||!o.firma)return Promise.resolve(false);
+  var msg=new TextEncoder().encode(['consulta-catastral',o.seq,o.v,o.archivo,o.sha256,o.tam].join('|')),pk=deb64(pub),fi=deb64(o.firma);
+  if(window.crypto&&crypto.subtle)return crypto.subtle.importKey('raw',pk,{name:'ECDSA',namedCurve:'P-256'},false,['verify']).then(function(k){return crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'},k,fi,msg);}).catch(function(){return verificaJS(pk,fi,msg);});
+  return Promise.resolve(verificaJS(pk,fi,msg));}
+
+/* ── red ── */
+function pide(u,ms,bin){var c=window.AbortController?new AbortController():null,to=c?setTimeout(function(){c.abort();},ms):0;
+  return fetch(u+(u.indexOf('?')<0?'?':'&')+'t='+Date.now(),{cache:'no-store',credentials:'omit',signal:c?c.signal:undefined}).then(function(r){clearTimeout(to);if(!r.ok)throw new Error('HTTP '+r.status);return bin?r.arrayBuffer():r.json();});}
+
+/* ── abrir la herramienta ── */
+function abre(o){estado('Abriendo '+o.v+'…',100);try{sessionStorage.setItem('cc-cargador','1');sessionStorage.setItem('cc-cargador-v',o.v);}catch(e){}
+  setTimeout(function(){document.open();document.write(o.html);document.close();},30);}
+function descarga(meta){estado('Descargando '+meta.v+'…',20);
+  return pide(SITIO+meta.archivo,120000,true).then(function(buf){var b=new Uint8Array(buf);estado('Comprobando la firma de '+meta.v+'…',70);
+    if(b.length!==meta.tam)throw new Error('el archivo descargado está incompleto');
+    return sha256(b).then(function(h){if(hex(h)!==meta.sha256)throw new Error('el archivo no coincide con la versión publicada');return verifica(meta);})
+      .then(function(ok){if(!ok)throw new Error('la firma no es válida; se descartó por seguridad');var o={v:meta.v,seq:meta.seq,fecha:meta.fecha,notas:meta.notas||'',html:new TextDecoder().decode(b)};
+        return guarda(o).then(function(){return o;});});});}
+function botones(h){$('cc-bt').innerHTML=h;}
+function sinNada(msg){estado(msg,0);botones('<button onclick="location.reload()">Reintentar</button>');
+  $('cc-nota').innerHTML='La primera vez se necesita internet para descargar la herramienta (unos 2.5 MB). Después se guarda en este navegador.';}
+
+estado('Buscando la versión más reciente…',8);
+Promise.all([lee(),pide(SITIO+'version.json',FORZAR?20000:T_ESPERA).catch(function(){return null;})]).then(function(r){
+  var loc=r[0],meta=r[1];
+  if(meta&&meta.app==='consulta-catastral'&&(!loc||meta.seq>loc.seq)){
+    var nueva=function(){return descarga(meta).then(abre).catch(function(e){if(loc){$('cc-nota').textContent='No se pudo actualizar ('+e.message+'). Se abre la versión guardada.';setTimeout(function(){abre(loc);},1600);}else sinNada('No se pudo descargar la herramienta: '+e.message+'.');});};
+    if(loc&&preguntar()&&!FORZAR){estado('Hay una versión nueva: '+meta.v+(meta.fecha?' ('+meta.fecha+')':''),0);$('cc-nota').textContent=meta.notas||'';
+      botones('<button id="b1">Actualizar ahora</button><button class="s" id="b2">Abrir la versión guardada ('+loc.v+')</button>');$('b1').onclick=nueva;$('b2').onclick=function(){abre(loc);};return;}
+    return nueva();}
+  if(loc){if(FORZAR&&meta)$('cc-nota').textContent='Ya tienes la versión más reciente ('+loc.v+').';return abre(loc);}
+  sinNada(meta?'No se pudo preparar la herramienta.':'Sin conexión con el sitio de la herramienta.');
+});
+})();
+</script>
+<noscript><div class="w"><div class="av">Este navegador tiene desactivado JavaScript; la herramienta no puede funcionar.</div></div></noscript>
+</body></html>

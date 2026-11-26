@@ -1,0 +1,12 @@
+{
+ "app": "consulta-catastral",
+ "v": "v156",
+ "seq": 156,
+ "fecha": "2026-11-26",
+ "archivo": "app-v156.html",
+ "tam": 2409919,
+ "sha256": "2280054d1981c5e68fc0fd857ba853a4633521315216db75c3ea41514d89eb4f",
+ "notas": "se integra el rellenador y generador de la solapa en su nuevo formato, corrección de bugs varios",
+ "llave": "p",
+ "firma": "PexBZTkiFoE4/m4An6Cj0czYJQ9jUYs+UoBCWHq0q2XjnbhlQzYdI9+ZQmILAKsXQkVJXPofnK1jtbQxzK1HIg=="
+}

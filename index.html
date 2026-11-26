@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Consulta Catastral · Guadalajara</title>
+<meta name="description" content="Herramienta pública, gratuita y no oficial para consultar la información catastral y normativa de predios en Guadalajara.">
+<style>
+:root{--bg:#f8fafc;--card:#fff;--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--acc:#0f766e}
+@media (prefers-color-scheme:dark){:root{--bg:#0b1220;--card:#111a2e;--ink:#e2e8f0;--mut:#94a3b8;--line:#22304d}}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.w{max-width:680px;margin:0 auto;padding:32px 16px 48px}h1{font-size:26px;margin:0 0 6px;letter-spacing:-.01em}.m{color:var(--mut);font-size:14px}
+.c{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin:16px 0}
+.b{display:block;text-align:center;text-decoration:none;font-weight:700;padding:14px;border-radius:12px;margin:10px 0;border:1px solid var(--acc)}
+.b.p{background:var(--acc);color:#fff}.b.s{color:var(--acc)}
+.al{border:1px solid #f59e0b;background:rgba(245,158,11,.1);border-radius:12px;padding:12px 14px;font-size:14px}
+.g{border:1px solid #86efac;background:rgba(34,197,94,.08);border-radius:12px;padding:12px 14px;font-size:14px}
+.qr{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.qr img{width:150px;height:150px;background:#fff;border-radius:10px;padding:6px}
+h2{font-size:17px;margin:0 0 8px}ol{padding-left:20px;margin:6px 0}#ver{font-size:13px;color:var(--mut)}
+</style></head><body><div class="w">
+<h1>Consulta Catastral · Guadalajara</h1>
+<p class="m">Herramienta pública, gratuita y sin fines de lucro para entender qué se puede construir en un predio: datos catastrales, normas del Plan Parcial, restricciones, croquis y más. <span id="ver"></span></p>
+
+<div class="c">
+ <a class="b p" id="usar" href="#">📱 Usar en línea (celular o iPhone)</a>
+ <a class="b s" href="consulta-catastral.html" download>💻 Descargar para computadora o Android</a>
+ <p class="m" style="margin:4px 0 0">El archivo descargado es ligero: la primera vez descarga la herramienta y después se actualiza sola, siempre con la versión más reciente.</p>
+</div>
+
+<div class="c">
+ <h2>Cómo usarla</h2>
+ <ol>
+  <li><b>Computadora o Android:</b> descarga el archivo y ábrelo con <b>Chrome</b> o <b>Edge</b>.</li>
+  <li><b>iPhone:</b> usa el botón «Usar en línea» desde <b>Safari</b>. Para tenerla como app: botón compartir → «Agregar a pantalla de inicio».</li>
+  <li>Si te la mandan por WhatsApp, <b>no la abras en la vista previa</b>: guárdala y ábrela con el navegador.</li>
+ </ol>
+</div>
+
+<div class="c qr"><img src="qr-consulta-catastral.png" alt="Código QR de esta página"><div><h2>Compártela</h2><p class="m">Este código lleva a esta página. Úsalo en carteles, tarjetas o mensajes.</p></div></div>
+
+<div class="g"><b>Es gratuita y siempre lo será.</b> No tiene pago único, ni suscripción mensual, ni versión premium. Si pagaste por ella o por una versión parecida, te cobraron algo que es gratis.</div>
+<p></p>
+<div class="al"><b>No es oficial.</b> Es un proyecto independiente, sin relación con el Ayuntamiento de Guadalajara ni con ninguna dependencia. Sus resultados son informativos, no vinculantes y no sustituyen dictámenes, certificados ni licencias. Los datos vienen de fuentes públicas.</div>
+<p class="m">Privacidad: esta página no usa cookies, estadísticas ni rastreo, y la herramienta no recaba datos personales. Al abrirla solo se consulta cuál es la versión más reciente.</p>
+</div>
+<script>
+fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(o){
+  document.getElementById('ver').textContent='Versión actual: '+o.v+(o.fecha?' ('+o.fecha+')':'')+'.';
+  document.getElementById('usar').href=o.archivo;}).catch(function(){document.getElementById('usar').href='consulta-catastral.html';});
+</script>
+</body></html>
