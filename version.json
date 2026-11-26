@@ -1,12 +1,12 @@
 {
  "app": "consulta-catastral",
- "v": "v156",
- "seq": 156,
+ "v": "v157",
+ "seq": 157,
  "fecha": "2026-11-26",
- "archivo": "app-v156.html",
- "tam": 2409919,
- "sha256": "2280054d1981c5e68fc0fd857ba853a4633521315216db75c3ea41514d89eb4f",
- "notas": "se integra el rellenador y generador de la solapa en su nuevo formato, corrección de bugs varios",
+ "archivo": "app-v157.html",
+ "tam": 2412123,
+ "sha256": "258ea51c1fd67cb2a00af51daf8c9f38d5cebb8624dfa1656e02fd188b6eee66",
+ "notas": "se agrego boton de agregar a favoritos",
  "llave": "p",
- "firma": "PexBZTkiFoE4/m4An6Cj0czYJQ9jUYs+UoBCWHq0q2XjnbhlQzYdI9+ZQmILAKsXQkVJXPofnK1jtbQxzK1HIg=="
+ "firma": "o0Zmz8oJahBKnp29dbAnfMysnPM6saA5hLhwpPBGORFqqOdVjs5ATvTGEIChHo5yPDkhIxF3ipQse38JPUxcuQ=="
 }
