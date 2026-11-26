@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Prueba de conexión · Consulta Catastral</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--ok:#15803d;--bad:#b91c1c;--warn:#b45309}
+@media (prefers-color-scheme:dark){:root{--bg:#0b1220;--card:#111a2e;--ink:#e2e8f0;--mut:#94a3b8;--line:#22304d}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.w{max-width:760px;margin:0 auto;padding:18px 16px 40px}h1{font-size:20px;margin:0 0 4px}p{margin:6px 0}.m{color:var(--mut);font-size:13px}
+#sinjs{background:#fef3c7;color:#78350f;border:1px solid #f59e0b;border-radius:12px;padding:12px 14px;margin:12px 0}
+.c{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:13.5px}td{border-bottom:1px solid var(--line);padding:7px 4px;vertical-align:top}td:first-child{width:46%}
+.ok{color:var(--ok);font-weight:700}.bad{color:var(--bad);font-weight:700}.wt{color:var(--warn);font-weight:700}
+button{font:inherit;padding:9px 14px;border-radius:10px;border:1px solid #0f766e;background:#0f766e;color:#fff;cursor:pointer}button.s{background:transparent;color:inherit;border-color:var(--line)}
+pre{white-space:pre-wrap;word-break:break-word;font-size:12px;background:rgba(148,163,184,.12);padding:10px;border-radius:10px;max-height:220px;overflow:auto}
+#res{font-size:16px;font-weight:700;margin:8px 0}
+</style></head><body><div class="w">
+<h1>Prueba de conexión</h1>
+<p class="m">Revisa si desde esta página se pueden consultar los servicios públicos que usa la herramienta. No guarda ni envía datos tuyos.</p>
+<div id="sinjs"><b>Esta vista no puede ejecutar la prueba.</b> Parece que se abrió en una vista previa (por ejemplo, la de WhatsApp). Ábrela en Safari o Chrome.</div>
+<div class="c"><div id="res">Probando…</div><table id="t"></table></div>
+<div class="c"><button id="cp">Copiar resultados</button> <button class="s" id="re">Repetir</button><pre id="info"></pre></div>
+</div>
+<script>
+document.getElementById('sinjs').style.display='none';
+var GS='https://visorgeoserver.guadalajara.gob.mx/geoserver/ows',CL='D65I2202019',R=[];
+function fila(n,st,det){var t=document.getElementById('t'),tr=document.createElement('tr');tr.innerHTML='<td>'+n+'</td><td class="'+(st==='OK'?'ok':st==='AVISO'?'wt':'bad')+'">'+st+' <span class="m" style="font-weight:400">'+(det||'')+'</span></td>';t.appendChild(tr);R.push(n+': '+st+' '+(det||''));}
+function wfs(tn,cql,n){return GS+'?service=WFS&version=1.0.0&request=GetFeature&typeName='+tn+'&outputFormat=application/json&maxFeatures='+(n||1)+'&CQL_FILTER='+encodeURIComponent(cql);}
+function pide(u,ms){var c=new AbortController(),to=setTimeout(function(){c.abort();},ms||15000),t0=Date.now();
+  return fetch(u,{credentials:'omit',signal:c.signal}).then(function(r){clearTimeout(to);return r.text().then(function(x){return {ok:r.ok,st:r.status,txt:x,ms:Date.now()-t0};});})
+  .catch(function(e){clearTimeout(to);return {ok:false,st:0,err:(e&&e.name==='AbortError')?'tiempo agotado':'bloqueado (CORS o red)',ms:Date.now()-t0};});}
+function img(u){return new Promise(function(res){var i=new Image(),t0=Date.now(),to=setTimeout(function(){res({ok:false,err:'tiempo agotado'});},15000);i.onload=function(){clearTimeout(to);res({ok:i.naturalWidth>0,ms:Date.now()-t0});};i.onerror=function(){clearTimeout(to);res({ok:false,err:'no cargó'});};i.src=u;});}
+function det(r,extra){return r.ok?('('+r.ms+' ms'+(extra?' · '+extra:'')+')'):('('+(r.err||('HTTP '+r.st))+')');}
+async function corre(){R=[];document.getElementById('t').innerHTML='';document.getElementById('res').textContent='Probando…';
+  var lng=-103.3845,lat=20.6927,fallas=0,criticas=0;
+  var r=await pide(wfs('vu:Predio_gcs',"clave='"+CL+"000'"));var ok=false;
+  try{var j=JSON.parse(r.txt||'{}');if(j.features&&j.features.length){ok=true;var g=j.features[0].geometry,c=g.coordinates;var ring=g.type==='MultiPolygon'?c[0][0]:c[0];lng=ring[0][0];lat=ring[0][1];}}catch(e){}
+  fila('1. Predio (catastro, WFS)',ok?'OK':'FALLA',det(r,ok?'predio encontrado':''));if(!ok){fallas++;criticas++;}
+  r=await pide(wfs('gic:Predio2025','DWITHIN(geom,POINT('+lng+' '+lat+'),30,meters)',5));ok=r.ok&&/"features"/.test(r.txt||'');fila('2. Predios vecinos (WFS)',ok?'OK':'FALLA',det(r));if(!ok){fallas++;criticas++;}
+  r=await pide(wfs('vu:Manzana_gcs','INTERSECTS(geom,POINT('+lng+' '+lat+'))'));ok=r.ok&&/"features"/.test(r.txt||'');fila('3. Manzana (WFS)',ok?'OK':'FALLA',det(r));if(!ok){fallas++;criticas++;}
+  r=await pide('https://visorurbano.guadalajara.gob.mx/vuapi/predio/'+btoa(JSON.stringify([[lng,lat]])));ok=r.ok;fila('4. Detalle de construcción (vuapi)',ok?'OK':'AVISO',det(r)+(ok?'':' · opcional'));if(!ok)fallas++;
+  r=await img(GS+'?service=WMS&version=1.1.1&request=GetMap&layers=vu:Manzana_gcs&styles=&srs=EPSG:4326&bbox='+(lng-0.002)+','+(lat-0.002)+','+(lng+0.002)+','+(lat+0.002)+'&width=64&height=64&format=image/png&transparent=true');
+  fila('5. Mapa (WMS, imagen)',r.ok?'OK':'FALLA',det(r));if(!r.ok)fallas++;
+  r=await pide('https://mapa.guadalajara.gob.mx:8443/geoserver/atlasriesgos/wms?service=WMS&version=1.1.1&request=GetFeatureInfo&layers=atlasriesgos:areas_de_inundacion&query_layers=atlasriesgos:areas_de_inundacion&info_format=application/json&srs=EPSG:4326&bbox='+(lng-0.001)+','+(lat-0.001)+','+(lng+0.001)+','+(lat+0.001)+'&width=3&height=3&x=1&y=1');
+  ok=r.ok;fila('6. Atlas de Riesgos',ok?'OK':'AVISO',det(r)+(ok?'':' · opcional'));if(!ok)fallas++;
+  r=await pide('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng);ok=r.ok;fila('7. Nombres de calles (OSM)',ok?'OK':'AVISO',det(r)+(ok?'':' · opcional'));if(!ok)fallas++;
+  var res=document.getElementById('res');res.textContent=criticas?'❌ No funciona desde aquí ('+criticas+' consulta(s) esencial(es) bloqueada(s))':fallas?'⚠️ Funciona, con '+fallas+' servicio(s) opcional(es) con problema':'✅ Todo funciona desde aquí';
+  res.style.color=criticas?'var(--bad)':fallas?'var(--warn)':'var(--ok)';
+  document.getElementById('info').textContent=['Resultado: '+res.textContent].concat(R,['Origen: '+(location.origin||location.protocol),'Navegador: '+navigator.userAgent,'Fecha: '+new Date().toISOString()]).join('\n');}
+document.getElementById('cp').onclick=function(){var t=document.getElementById('info').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){document.getElementById('cp').textContent='¡Copiado!';},function(){var s=window.getSelection(),rg=document.createRange();rg.selectNodeContents(document.getElementById('info'));s.removeAllRanges();s.addRange(rg);});};
+document.getElementById('re').onclick=corre;corre();
+</script></body></html>
