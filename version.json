@@ -1,12 +1,12 @@
 {
  "app": "consulta-catastral",
- "v": "v164",
- "seq": 164,
- "fecha": "2026-11-26",
- "archivo": "app-v164.html",
- "tam": 2415291,
- "sha256": "e57c97725954164a56988c9c3877f7df577e1cb5b0d28c8e07c2949ecab7ad46",
- "notas": "proyección a futuro de nuevas herramientas",
+ "v": "v167",
+ "seq": 167,
+ "fecha": "2026-11-27",
+ "archivo": "app-v167.html",
+ "tam": 2421435,
+ "sha256": "748923327c0a0129c186e812e30e9c56688eac631fea3cbf7e90170368795dfd",
+ "notas": "",
  "llave": "p",
- "firma": "9rWHtxli7OCfpEtSoz/SdTCUid/4Vd69WlnjtP+JmcVSocsxWEexjd9ihixk1z5yaYjalepKWu4w5cP/ZtPPCA=="
+ "firma": "pbXYrTEMep4JhabUfqcw2e8AJZpR5DQebdm05X2klAndniai0D0RskpkBkGql9+ruTh7iCmYNl+DD2ZBsbT5cw=="
 }
