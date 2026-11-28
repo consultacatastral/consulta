@@ -3,15 +3,15 @@
  "herr": {
   "normativa": {
    "nom": "Consulta Normativa",
-   "v": "v6",
-   "seq": 6,
-   "fecha": "2026-11-27",
-   "archivo": "normativa-v6.html",
-   "tam": 1735587,
-   "sha256": "34ef1af573509603d802c57afb9f8bbce639ec24965c7a47db41e95339d42a48",
+   "v": "v7",
+   "seq": 7,
+   "fecha": "2026-11-28",
+   "archivo": "normativa-v7.html",
+   "tam": 1736104,
+   "sha256": "3910066062e415df7ec5fb5347c58eaf331ab4ca5f4b57791b852317edce53e5",
    "notas": "",
    "llave": "p",
-   "firma": "/00O+QQT74uH0z9wLdyH5DTvsxNgXfrmn5x6uN2YtDUntRq4Uels+4iaJI67aDaoiGhqlNbJ8vcWlZu/6qJcGA=="
+   "firma": "DZ/Ggo4u1TQawv4n9Z0fwQMuXiR5mDfyFgq38gHm5/ebR9w/JxD9SnERcHyTxNR3WKhqAJ3y+ncbwBoukAjhyw=="
   }
  }
 }
